@@ -23,6 +23,9 @@ public class Tower extends Creature implements IUpdateable {
     public static final double INITIAL_Y_OFFSET = 2d;
     private static Tower instance;
     private final TowerMovementController<Tower> towerMovementController;
+    private Point cannonTip;
+    private float rotationSpeed = 10f;
+    private int cannonRadius = 20;
 
     public static Tower instance() {
         if (instance == null) {
@@ -32,10 +35,19 @@ public class Tower extends Creature implements IUpdateable {
         return instance;
     }
 
+    public Point getCannonTip() {
+        return cannonTip;
+    }
+
+    public void setCannonTip(Point cannonTip) {
+        this.cannonTip = cannonTip;
+    }
+
+
     private Tower() {
-        //IMPORTANT: Sprites must follow the naming convention when being imported into the utiLITI
+        //IMPORTANT: Sprites must respect the naming convention when being imported into the utiLITI
         super("tower1");
-        this.towerMovementController = new TowerMovementController<>(this, new Point((int)this.getWidth() / 3, (int)this.getHeight() / 2));
+        this.towerMovementController = new TowerMovementController<>(this);
         // setup movement controller
         this.addController(towerMovementController);
     }
@@ -47,5 +59,19 @@ public class Tower extends Creature implements IUpdateable {
 
     public ITankMovementListener getTankMovementListener() {
         return this.towerMovementController;
+    }
+
+    public float getTowerRotationSpeed() {
+        return this.rotationSpeed;
+    }
+
+    public void updateCannonTip(float angle, Point rotationalCenter) {
+        float x = (float) (this.cannonRadius * Math.cos(angle) + rotationalCenter.getX());
+        float y = (float) (this.cannonRadius * Math.sin(angle) + rotationalCenter.getY());
+        this.cannonTip.setLocation(x, y);
+    }
+
+    public int getCannonRadius() {
+        return this.cannonRadius;
     }
 }

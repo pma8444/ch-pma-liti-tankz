@@ -40,7 +40,7 @@ public class TankzController {
         // add default game logic for when a level was loaded
         Game.world().addLoadedListener(e -> {
 
-            // spawn the player instance on the spawn point with the name "enter"
+            // spawn the player instance on the spawn point with the name "spawnTank"
             Spawnpoint enter = e.getSpawnpoint("spawnTank");
             if (enter != null) {
                 Tower tower = Tower.instance();
