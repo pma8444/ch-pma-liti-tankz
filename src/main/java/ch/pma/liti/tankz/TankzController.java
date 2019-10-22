@@ -58,6 +58,5 @@ public class TankzController {
         Game.screens().display(InGameScreen.NAME);
 
         Game.start();
-
     }
 }
