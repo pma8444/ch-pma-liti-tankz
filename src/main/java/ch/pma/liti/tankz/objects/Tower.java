@@ -23,16 +23,15 @@ import java.awt.geom.Ellipse2D;
 public class Tower extends Creature implements IUpdateable, IRenderable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Tower.class);
-    private static final int ROT_CENTER_WIDTH_OFFSET = 30;
+    private static final int ROT_CENTER_X_OFFSET = 20;
+    private static final int ROT_CENTER_Y_OFFSET = 0;
     public static final double INITIAL_X_OFFSET = 20d;
     public static final double INITIAL_Y_OFFSET = 2d;
     private static Tower instance;
     private final TowerMovementController<Tower> towerMovementController;
     private Point cannonTip;
-    private float rotationSpeed = 1f;
-    private int cannonRadius = 20;
+    private int cannonRadius = 70;
     private double angleToTurn;
-    private float angleCorrection = 0;
     private float currentAngle = 0;
 
     private Tower() {
@@ -41,6 +40,7 @@ public class Tower extends Creature implements IUpdateable, IRenderable {
         this.towerMovementController = new TowerMovementController<>(this);
         // setup movement controller
         this.addController(towerMovementController);
+        this.cannonTip = new Point();
     }
 
     public static Tower instance() {
@@ -52,21 +52,24 @@ public class Tower extends Creature implements IUpdateable, IRenderable {
         return instance;
     }
 
-    public Point getCannonTip() {
-        return new Point((int)(this.getX() + this.getWidth()), (int)(this.getY() + this.getHeight() / 2));
+    public void updateCannonTip() {
+        float angle = (float) Math.toRadians(this.currentAngle);
+        float x = (float) (this.cannonRadius * Math.cos(angle) + getRotationalCenter().getX());
+        float y = (float) (this.cannonRadius * Math.sin(angle) + getRotationalCenter().getY());
+        this.cannonTip.setLocation(x, y);
     }
 
     @Override
     public void update() {
-        if((int) currentAngle != (int) angleToTurn) {
-            LOGGER.debug("curr: [{}], target: [{}]", currentAngle, angleToTurn);
-            this.angleCorrection = getAngleCorrection();
-            this.currentAngle += this.angleCorrection;
+        LOGGER.debug("curr: [{}], target: [{}]", currentAngle, angleToTurn);
+        float angleCorrection = getAngleCorrection();
+        this.currentAngle += angleCorrection;
 
-            AffineTransform affineTransform = new AffineTransform();
-            affineTransform.rotate(Math.toRadians(this.currentAngle), ROT_CENTER_WIDTH_OFFSET, this.getHeight() / 2);
-            this.getAnimationController().setAffineTransform(affineTransform);
-        }
+        AffineTransform affineTransform = new AffineTransform();
+        affineTransform.rotate(Math.toRadians(this.currentAngle), ROT_CENTER_X_OFFSET, this.getHeight() / 2 + ROT_CENTER_Y_OFFSET);
+        this.getAnimationController().setAffineTransform(affineTransform);
+
+        updateCannonTip();
     }
 
     public ITankMovementListener getTankMovementListener() {
@@ -77,8 +80,20 @@ public class Tower extends Creature implements IUpdateable, IRenderable {
         this.angleToTurn = angleToTurn;
     }
 
+    @Override
+    public void render(Graphics2D g) {
+        double radius = 2d;
+        Game.graphics().renderShape(g, new Ellipse2D.Double(getCannonTip().getX() - radius, getCannonTip().getY() - radius, 2.0 * radius, 2.0 * radius));
+        Game.graphics().renderShape(g, new Ellipse2D.Double(getRotationalCenter().getX() - radius, getRotationalCenter().getY() - radius, 2.0 * radius, 2.0 * radius));
+    }
+
+    public Point getCannonTip() {
+        return this.cannonTip;
+    }
+
     private float getTowerRotationSpeed() {
-        return this.rotationSpeed;
+        float rotationSpeed = 1f;
+        return rotationSpeed;
     }
 
     private float getAngleCorrection() {
@@ -98,14 +113,8 @@ public class Tower extends Creature implements IUpdateable, IRenderable {
     }
 
     private Point getRotationalCenter() {
-        int x = (int) (this.getX() + this.getWidth() / 2 - ROT_CENTER_WIDTH_OFFSET);
-        int y = (int) (this.getY() + this.getHeight() / 2);
+        int x = (int) (this.getX() + ROT_CENTER_X_OFFSET);
+        int y = (int) (this.getY() + this.getHeight() / 2 + ROT_CENTER_Y_OFFSET);
         return new Point(x, y);
-    }
-
-    @Override
-    public void render(Graphics2D g) {
-        double radius = 5d;
-        Game.graphics().renderShape(g, new Ellipse2D.Double(getCannonTip().getX() - radius, getCannonTip().getY() - radius, 2.0 * radius, 2.0 * radius));
     }
 }
