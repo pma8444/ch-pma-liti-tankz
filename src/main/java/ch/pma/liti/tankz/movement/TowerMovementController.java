@@ -36,8 +36,8 @@ public class TowerMovementController<T extends IMobileEntity> extends MovementCo
     }
 
     private void handleMouseMovement(MouseEvent mouseEvent) {
-        float xDistance = (float) (mouseEvent.getPoint().getX() - this.tower.getCannonTip().getX());
-        float yDistance = (float) (mouseEvent.getPoint().getY() - this.tower.getCannonTip().getY());
+        float xDistance = (float) (mouseEvent.getPoint().getX() - this.tower.getRotationalCenter().getX());
+        float yDistance = (float) (mouseEvent.getPoint().getY() - this.tower.getRotationalCenter().getY());
         this.tower.setAngleToTurn(Math.toDegrees(Math.atan2(yDistance, xDistance)));
     }
 }

@@ -43,9 +43,9 @@ public class TankzController {
             // spawn the player instance on the spawn point with the name "spawnTank"
             Spawnpoint enter = e.getSpawnpoint("spawnTank");
             if (enter != null) {
-                Tower tower = Tower.instance();
+                Tower tower = new Tower();
                 ITankMovementListener tankMovementListener = tower.getTankMovementListener();
-                Tank tank = Tank.instance(tankMovementListener);
+                Tank tank = new Tank(tankMovementListener);
                 enter.spawn(tank);
                 enter.spawn(tower);
                 tower.setX(tower.getX()+Tower.INITIAL_X_OFFSET);
