@@ -83,8 +83,8 @@ public class Tower extends AbstractTower implements IUpdateable, IRenderable {
     @Override
     protected void updateCannonTip() {
         float angle = (float) Math.toRadians(this.currentAngle);
-        float x = (float) (this.CANNON_RADIUS * Math.cos(angle) + getRotationalCenter().getX());
-        float y = (float) (this.CANNON_RADIUS * Math.sin(angle) + getRotationalCenter().getY());
+        float x = (float) (CANNON_RADIUS * Math.cos(angle) + getRotationalCenter().getX());
+        float y = (float) (CANNON_RADIUS * Math.sin(angle) + getRotationalCenter().getY());
         this.cannonTip.setLocation(x, y);
     }
 }

@@ -1,6 +1,7 @@
 package ch.pma.liti.tankz;
 
 import ch.pma.liti.tankz.movement.ITankMovementListener;
+import ch.pma.liti.tankz.objects.CannonShot;
 import ch.pma.liti.tankz.objects.Tank;
 import ch.pma.liti.tankz.objects.Tower;
 import ch.pma.liti.tankz.screens.InGameScreen;
@@ -43,20 +44,24 @@ public class TankzController {
             // spawn the player instance on the spawn point with the name "spawnTank"
             Spawnpoint enter = e.getSpawnpoint("spawnTank");
             if (enter != null) {
-                Tower tower = new Tower();
-                ITankMovementListener tankMovementListener = tower.getTankMovementListener();
-                Tank tank = new Tank(tankMovementListener);
-                enter.spawn(tank);
-                enter.spawn(tower);
-                tower.setX(tower.getX()+Tower.INITIAL_X_OFFSET);
-                tower.setY(tower.getY()+Tower.INITIAL_Y_OFFSET);
+                initTankObjects(enter);
             }
         });
 
         Game.world().loadEnvironment("tankz_level_1");
         Game.screens().add(new InGameScreen());
         Game.screens().display(InGameScreen.NAME);
-
         Game.start();
+    }
+
+    private void initTankObjects(Spawnpoint enter) {
+        Tower tower = new Tower();
+        ITankMovementListener tankMovementListener = tower.getTankMovementListener();
+        Tank tank = new Tank(tankMovementListener);
+        new CannonShot(tower, "shot1");
+        enter.spawn(tank);
+        enter.spawn(tower);
+        tower.setX(tower.getX()+Tower.INITIAL_X_OFFSET);
+        tower.setY(tower.getY()+Tower.INITIAL_Y_OFFSET);
     }
 }

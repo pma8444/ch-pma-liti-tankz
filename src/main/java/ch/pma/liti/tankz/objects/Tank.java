@@ -7,6 +7,7 @@ import de.gurkenlabs.litiengine.annotation.CollisionInfo;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.annotation.MovementInfo;
 import de.gurkenlabs.litiengine.entities.Creature;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 
 import java.awt.*;
 
@@ -20,6 +21,7 @@ public class Tank extends Creature implements IUpdateable {
         super("tank1");
         // setup movement controller
         this.addController(new TankMovementController<>(this, new Point((int)this.getWidth() / 2, (int)this.getHeight() / 2), tankMovementListener));
+        this.setRenderType(RenderType.SURFACE);
     }
 
     @Override
