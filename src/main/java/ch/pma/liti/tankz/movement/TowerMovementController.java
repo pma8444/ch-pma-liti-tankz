@@ -1,25 +1,25 @@
 package ch.pma.liti.tankz.movement;
 
 import ch.pma.liti.tankz.objects.Tower;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.entities.IMobileEntity;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.physics.MovementController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class TowerMovementController<T extends IMobileEntity> extends MovementController<T> implements ITankMovementListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TowerMovementController.class);
-    private static final int REVERSE_VELOCITY = -1;
     private static final int NO_VELOCITY = 0;
     private final Tower tower;
+    private Point mouseLocation;
 
     public TowerMovementController(T mobileEntity) {
         super(mobileEntity);
         this.tower = (Tower) mobileEntity;
         Input.mouse().onMoved(this::handleMouseMovement);
+        mouseLocation = new Point((int)Input.mouse().getLocation().getX(), (int)Input.mouse().getLocation().getY());
     }
 
     @Override
@@ -33,11 +33,21 @@ public class TowerMovementController<T extends IMobileEntity> extends MovementCo
     public void tankMovement(double velocityX, double velocityY) {
         this.setVelocityX(velocityX);
         this.setVelocityY(velocityY);
+        updateAngleToTurn();
     }
 
     private void handleMouseMovement(MouseEvent mouseEvent) {
-        float xDistance = (float) (mouseEvent.getPoint().getX() - this.tower.getRotationalCenter().getX());
-        float yDistance = (float) (mouseEvent.getPoint().getY() - this.tower.getRotationalCenter().getY());
+        setMouseLocation(mouseEvent.getPoint());
+        updateAngleToTurn();
+    }
+
+    private synchronized void updateAngleToTurn() {
+        float xDistance = (float) (mouseLocation.getX() / Game.graphics().getBaseRenderScale() - this.tower.getRotationalCenter().getX());
+        float yDistance = (float) (mouseLocation.getY() / Game.graphics().getBaseRenderScale() - this.tower.getRotationalCenter().getY());
         this.tower.setAngleToTurn(Math.toDegrees(Math.atan2(yDistance, xDistance)));
+    }
+
+    private void setMouseLocation(Point point) {
+        this.mouseLocation = point;
     }
 }

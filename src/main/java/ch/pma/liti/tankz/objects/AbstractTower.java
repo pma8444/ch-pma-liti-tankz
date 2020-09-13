@@ -6,11 +6,13 @@ import de.gurkenlabs.litiengine.entities.Creature;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 public abstract class AbstractTower extends Creature {
 
     private final TowerMovementController<AbstractTower> towerMovementController;
+    protected AffineTransform affineTransform;
     Point2D cannonTip;
     double angleToTurn;
     float currentAngle = 0;
@@ -21,10 +23,15 @@ public abstract class AbstractTower extends Creature {
         this.addController(towerMovementController);
         this.cannonTip = new Point();
         this.setRenderType(RenderType.NORMAL);
+        this.affineTransform = new AffineTransform();
     }
 
     Point2D getCannonTip() {
         return this.cannonTip;
+    }
+
+    void setCannonTip(Point2D cannonTip) {
+        this.cannonTip = cannonTip;
     }
 
     public ITankMovementListener getTankMovementListener() {
@@ -42,4 +49,6 @@ public abstract class AbstractTower extends Creature {
     public abstract Point getRotationalCenter();
 
     protected abstract void updateCannonTip();
+
+    public abstract void initCannonShotController();
 }

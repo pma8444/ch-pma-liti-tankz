@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.graphics.IRenderable;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 
 @EntityInfo(width = 91, height = 34)
 @MovementInfo(velocity = 70, turnOnMove = false)
@@ -22,22 +23,27 @@ public class Tower extends AbstractTower implements IUpdateable, IRenderable {
     public static final double INITIAL_X_OFFSET = 20d;
     public static final double INITIAL_Y_OFFSET = 2d;
     private static final int CANNON_RADIUS = 70;
+    private final CannonShotController cannonShotController;
 
-    public Tower() {
+    public Tower(CannonShotController cannonShotController) {
         //IMPORTANT: Sprites must respect the naming convention when being imported into the utiLITI
         super("tower1");
+        this.cannonShotController = cannonShotController;
     }
 
     @Override
     public void update() {
         float angleCorrection = getAngleCorrection();
-        this.currentAngle += angleCorrection;
+        if(angleCorrection != 0f) {
+            this.currentAngle += angleCorrection;
 
-        AffineTransform affineTransform = new AffineTransform();
-        affineTransform.rotate(Math.toRadians(this.currentAngle), ROT_CENTER_X_OFFSET, this.getHeight() / 2 + ROT_CENTER_Y_OFFSET);
-        this.getAnimationController().setAffineTransform(affineTransform);
+            this.affineTransform = new AffineTransform();
+            this.affineTransform.rotate(Math.toRadians(this.currentAngle), ROT_CENTER_X_OFFSET, this.getHeight() / 2 + ROT_CENTER_Y_OFFSET);
+            this.getAnimationController().setAffineTransform(this.affineTransform);
 
+        }
         updateCannonTip();
+        this.cannonShotController.updateSpawnPoint(getRotationalCenter(), angleCorrection, CANNON_RADIUS);
     }
 
     @Override
@@ -69,10 +75,13 @@ public class Tower extends AbstractTower implements IUpdateable, IRenderable {
 
         if(normalizedAngleDifference > 360) {
             normalizedAngleDifference -= 360;
+        } else if(normalizedAngleDifference < 0) {
+            normalizedAngleDifference += 360;
         }
 
         if (normalizedAngleDifference > 1 && (normalizedAngleDifference < 359)) {
             angleCorrection = Math.copySign(this.getTowerRotationSpeed(), currentAngleDifference);
+            //Rotate forward or backwards, depending on what's closer
             if (normalizedAngleDifference > 180) {
                 angleCorrection = angleCorrection * -1;
             }
@@ -82,9 +91,16 @@ public class Tower extends AbstractTower implements IUpdateable, IRenderable {
 
     @Override
     protected void updateCannonTip() {
-        float angle = (float) Math.toRadians(this.currentAngle);
-        float x = (float) (CANNON_RADIUS * Math.cos(angle) + getRotationalCenter().getX());
-        float y = (float) (CANNON_RADIUS * Math.sin(angle) + getRotationalCenter().getY());
-        this.cannonTip.setLocation(x, y);
+        setCannonTip(calculateCannonTip());
+    }
+
+    private Point2D calculateCannonTip() {
+        double angle = Math.toRadians(this.currentAngle);
+        return new Point2D.Double(CANNON_RADIUS * Math.cos(angle) + getRotationalCenter().getX(), CANNON_RADIUS * Math.sin(angle) + getRotationalCenter().getY());
+    }
+
+    @Override
+    public void initCannonShotController() {
+        this.cannonShotController.initSpawnPoint(calculateCannonTip(), CANNON_RADIUS);
     }
 }

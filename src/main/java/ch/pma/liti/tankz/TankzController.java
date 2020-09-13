@@ -1,7 +1,7 @@
 package ch.pma.liti.tankz;
 
 import ch.pma.liti.tankz.movement.ITankMovementListener;
-import ch.pma.liti.tankz.objects.CannonShot;
+import ch.pma.liti.tankz.objects.CannonShotController;
 import ch.pma.liti.tankz.objects.Tank;
 import ch.pma.liti.tankz.objects.Tower;
 import ch.pma.liti.tankz.screens.InGameScreen;
@@ -33,7 +33,7 @@ public class TankzController {
         camera.setClampToMap(true);
         Game.world().setCamera(camera);
 
-        Game.graphics().setBaseRenderScale(1f);
+        Game.graphics().setBaseRenderScale(2f);
 
         // set a basic gravity for all levels.
         Game.world().setGravity(0);
@@ -55,13 +55,14 @@ public class TankzController {
     }
 
     private void initTankObjects(Spawnpoint enter) {
-        Tower tower = new Tower();
+        CannonShotController cannonShotController = new CannonShotController("shot1");
+        Tower tower = new Tower(cannonShotController);
         ITankMovementListener tankMovementListener = tower.getTankMovementListener();
         Tank tank = new Tank(tankMovementListener);
-        new CannonShot(tower, "shot1");
         enter.spawn(tank);
         enter.spawn(tower);
         tower.setX(tower.getX()+Tower.INITIAL_X_OFFSET);
         tower.setY(tower.getY()+Tower.INITIAL_Y_OFFSET);
+        tower.initCannonShotController();
     }
 }
